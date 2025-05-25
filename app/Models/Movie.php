@@ -1,28 +1,59 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 class Movie extends Model
 {
-use HasFactory;
-protected $fillable = [
-    'movie_title',
-    'movie_description',
-    'genre_id',
-    'rate_id',
-    'actor1',
-    'actor2',
-    'movie_poster',
-    'movie_trailer',
-    'released_date',
-    'rating',
-];
+    use HasFactory;
 
-public function genre()
-{
-    return $this->belongsTo(Genre::class);
-}
+    protected $fillable = [
+        'title',
+        'description',
+        'average_rating',
+        'poster',
+        'trailer',
+        'release_date',
+    ];
 
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class);
+    }
 
+    public function actors()
+    {
+        return $this->belongsToMany(Actor::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating');
+    }
+
+    public function watchlists()
+    {
+        return $this->hasMany(Watchlist::class);
+    }
+    public function scopePopular($query)
+    {
+        return $query->orderByDesc('average_rating')->limit(10);
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where('release_date', '>', now())->orderBy('release_date');
+    }
+
+    public function scopeMostRated($query)
+    {
+        return $query->withCount('ratings')->orderByDesc('ratings_count');
+    }
 }
