@@ -3,7 +3,7 @@
 @section('content')
     <h1>Edit Movie</h1>
 
-    <form action="{{ route('admin.movies.update', $movie->id) }}" method="POST">
+    <form action="{{ route('movies.update', $movie->id) }}" method="POST">
         @csrf
         @method('PUT')
         <input type="text" name="movie_title" value="{{ $movie->movie_title }}" required>

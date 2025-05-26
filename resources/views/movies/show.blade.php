@@ -73,15 +73,15 @@
                                 <hr>
                                 <div class="mb-2 row">
                                     <div class="col-md-9 offset-md-3">
-                                        <a href="{{ route('admin.movies.edit', $movie->id) }}" class="btn btn-info">Edit</a>
-                                        <form action="{{ route('admin.movies.delete', $movie->id) }}" method="POST" class="d-inline"
+                                        <a href="{{ route('movies.edit', $movie->id) }}" class="btn btn-info">Edit</a>
+                                        {{-- <form action="{{ route('movies.delete', $movie->id) }}" method="POST" class="d-inline"
                                               onsubmit="return confirm('Are you sure you want to delete this movie?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger" title="Delete">
                                                 Delete
                                             </button>
-                                        </form>
+                                        </form> --}}
                                         <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">Back</a>
                                     </div>
                                 </div>
