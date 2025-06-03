@@ -15,14 +15,23 @@ class MovieController extends Controller
     {
         $query = Movie::with(['genres', 'actors']);
 
-        // Filtering
-        if ($request->has('popular')) {
+
+        if ($genreId = $request->input('genre_id')) {
+            $query->whereHas('genres', function ($q) use ($genreId) {
+                $q->where('genres.id', $genreId);
+            });
+        }
+
+        // Filter by popular if popular=1
+        if ($request->filled('popular') && $request->input('popular') == 1) {
             $query->popular();
         }
 
-        if ($request->has('upcoming')) {
+        // Filter by upcoming if upcoming=1
+        if ($request->filled('upcoming') && $request->input('upcoming') == 1) {
             $query->upcoming();
         }
+
 
         if ($request->has('most_rated')) {
             $query->mostRated();
@@ -61,6 +70,8 @@ class MovieController extends Controller
             'title'         => 'required|string',
             'description'   => 'nullable|string',
             'release_date'  => 'required|date',
+            'poster' => 'sometimes|nullable|string',
+            'trailer' => 'sometimes|nullable|string',
             'genre_ids'     => 'array',
             'actor_ids'     => 'array',
         ]);
@@ -101,6 +112,9 @@ class MovieController extends Controller
             'title'        => 'sometimes|string',
             'description'  => 'sometimes|string',
             'release_date' => 'sometimes|date',
+            'rating'       => 'sometimes|numeric|min:0|max:10',
+            'poster' => 'sometimes|nullable|string',
+            'trailer' => 'sometimes|nullable|string',
             'genre_ids'    => 'sometimes|array',
             'actor_ids'    => 'sometimes|array',
         ]);
