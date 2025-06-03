@@ -27,77 +27,101 @@
     </div>
 
     <!-- Add New Movie Button -->
-    <div class="mb-4">
-        <a href="{{ route('admin.movies.create') }}" class="btn btn-primary">➕ Add New Movie</a>
-    </div>
+    {{-- <div lass="row mb-4"> --}}
+        {{-- <div class="col-md-6">
+            <a href="{{ route('movies.create') }}" class="btn btn-primary">➕ Add New Movie</a>
+        </div> --}}
+       <div class="col-mb-6 pb-2">
+            <div class="input-group-append">
+                <form method="GET" action="{{ route('admin.dashboard') }}">
+                    <div class="flex gap-2 items-center">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search by title"
+                            class="border rounded px-3 py-2" />
+                            <button class="btn btn-outline-secondary" type="submit" id="button-addon2">
+                            <i class="bi bi-search-heart"></i>
+                    </button>
+                        @if(request('search'))
+                        <a href="{{ route('admin.dashboard') }}" class="text-sm text-blue-600 hover:underline">Clear</a>
+                        @endif
+                    </div>
+                </form>
+            </div>   
+        </div>        
+ 
+    {{-- </div> --}}
+
 
     <!-- Movies Table -->
     <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Movies List</h5>
-            @include('admin.movies._movie-search')
+        <div class="card-header bg-[#1D1616] text-white">
+            <h1 class="mb-0">Movies List</h1>
+            {{-- @include('admin.movies._movie-search') --}}
         </div>
         <div class="card-body p-0">
             
             <table class="table table-striped table-hover mb-0">
-                <thead class="table-dark">
+                <thead class="bg-light">
                     <tr>
                         <th>Title</th>
-                        <th>Genre</th>
+                        <th>Genres</th>
                         <th>Rating</th>
                         <th>Description</th>
-                        <th class="text-end me-6">Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if ($movies->isEmpty())
                         <tr>
-                            <td colspan="3" class="text-center text-muted">No movies found.</td>
+                            <td colspan="5" class="text-center text-muted">No movies found.</td>
                         </tr>
                     @else
                         @foreach ($movies as $movie)
                             <tr>
-                                
-                                <td>{{ $movie->movie_title }}</td>
-                                <td>{{ $movie->genres->name ?? 'N/A' }}</td>
-                                <td>{{ $movie->rating->name ?? 'N/A' }}</td>
-                                <td>{{ $movie->movie_description }}</td>
+                                <td>{{ $movie->title }}</td>
+
+                                <td>
+                                    @if ($movie->genres->isNotEmpty())
+                                        {{ $movie->genres->pluck('name')->join(', ') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+
+                                <td>{{ $movie->average_rating ?? 'N/A' }}</td>
+                                <td>{{ Str::limit($movie->description, 50) }}</td>
+
                                 <td class="text-end">
-                                     <a href="{{ route('admin.movies.show', $movie->id) }}"
-                                                       class="btn btn-sm btn-circle btn-outline-info" title="Show">
-                                                        View
-                                                    </a>
-                                    <a href="{{ route('admin.movies.edit', $movie->id) }}" class="btn btn-sm btn-warning " title="Edit">
-                                         Edit
-                                    </a>
-                                    
-                                    <form action="{{ route('admin.movies.delete', $movie->id) }}" method="POST" class="d-inline">
+                                    {{-- Future actions --}}
+                                    <a href="{{ route('movies.show', $movie->id) }}" class="btn btn-sm btn-info">View</a>
+                                    {{-- <a href="{{ route('movies.edit', $movie->id) }}" class="btn btn-sm btn-warning">Edit</a> --}}
+                                    <form action="{{ route('movies.destroy', $movie->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this movie?')" title="Delete">
-                                            Delete
-                                        </button>
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this movie?')">Delete</button>
                                     </form>
-                               
                                 </td>
                             </tr>
                         @endforeach
                     @endif
                 </tbody>
             </table>
-               <nav class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                                    </li>
-                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
+            {{-- Pagination links --}}
+            {{-- <div class="mt-3">
+                {{ $movies->links() }}
+            </div> --}}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
     </div>

@@ -15,7 +15,7 @@ class MovieController extends Controller
     {
         $query = Movie::with(['genres', 'actors']);
 
-
+        // Filter by genre ID (e.g., ?genre_id=3)
         if ($genreId = $request->input('genre_id')) {
             $query->whereHas('genres', function ($q) use ($genreId) {
                 $q->where('genres.id', $genreId);
@@ -41,11 +41,10 @@ class MovieController extends Controller
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%$search%");
         }
+        
 
-        // Get per_page from query, default to 10
+        // Pagination
         $perPage = $request->input('per_page', 10);
-
-        // Paginate results
         $movies = $query->paginate($perPage);
 
         return response()->json([
@@ -59,6 +58,7 @@ class MovieController extends Controller
             ],
         ]);
     }
+
 
 
     /**
