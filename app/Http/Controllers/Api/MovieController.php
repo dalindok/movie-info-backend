@@ -22,14 +22,16 @@ class MovieController extends Controller
             });
         }
 
-        // Filtering popular, upcoming, most rated
-        if ($request->has('popular')) {
+        // Filter by popular if popular=1
+        if ($request->filled('popular') && $request->input('popular') == 1) {
             $query->popular();
         }
 
-        if ($request->has('upcoming')) {
+        // Filter by upcoming if upcoming=1
+        if ($request->filled('upcoming') && $request->input('upcoming') == 1) {
             $query->upcoming();
         }
+
 
         if ($request->has('most_rated')) {
             $query->mostRated();
