@@ -10,18 +10,29 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $totalUsers = User::count();
         $totalMovies = Movie::count();
         $genres = Genre::all();
-        $movies = Movie::with('genres')->paginate(10);
+        // $movies = Movie::with('genres')->paginate(10);
+        $query = Movie::query();
 
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
+        }
+
+    $movies = $query->with(['genres', 'actors'])->paginate(10); // or ->get()
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'totalMovies' => $totalMovies,
             'movies' => $movies,
             'genres' => $genres
         ]);
+       
+
+    // return view('movies.', compact('movies'));
     }
 }

@@ -1,95 +1,96 @@
 @extends('layouts.app')
+
 @section('content')
 <main class="py-5">
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header card-title">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
                         <strong>Movie Details</strong>
                     </div>
+
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <!-- Title -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Title</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">{{ $movie->title }}</p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Title</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">{{ $movie->movie_title }}</p>
-                                    </div>
-                                </div>
+                        <!-- Description -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Description</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">{{ $movie->description }}</p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Description</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">{{ $movie->description }}</p>
-                                    </div>
-                                </div>
+                        <!-- Genre -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Genre</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">
+                                    {{ $movie->genres->pluck('name')->join(', ') ?: 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Genre</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">{{ $movie->genre->name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
+                        <!-- Rating -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Rating</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">
+                                    {{ $movie->rating->name ?? 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Rating</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">{{ $movie->rating->name ?? 'N/A' }}</p>
-                                    </div>
-                                </div>
+                        <!-- Release Date -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Release Date</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">
+                                    {{ \Carbon\Carbon::parse($movie->released_date)->format('F d, Y') }}
+                                </p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Released Date</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">{{ $movie->released_date }}</p>
-                                    </div>
-                                </div>
+                        <!-- Actors -->
+                        <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Actors</label>
+                            <div class="col-md-9">
+                                <p class="form-control-plaintext text-muted">
+                                    {{ $movie->actors->pluck('name')->join(', ') ?: 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Cast</label>
-                                    <div class="col-md-9">
-                                        <p class="form-control-plaintext text-muted">
-                                            {{ $movie->actor1 }}{{ $movie->actor2 ? ', ' . $movie->actor2 : '' }}
-                                        </p>
-                                    </div>
-                                </div>
+                        
+                        <!-- Poster -->
+                        <div class="mb-3 row">
+                                           <label class="col-md-3 col-form-label">Poster</label>
+                            <div class="col-md-9">
+                                <img src="{{ $movie->poster}}" alt="Poster" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                            </div>
+                        </div>
+                                 <!-- Trailer -->
+                                 <div class="mb-3 row">
+                            <label class="col-md-3 col-form-label">Trailer</label>
+                            <div class="col-md-9">
+                                <a href="{{ $movie->trailer}}" target="_blank" class="btn btn-outline-primary">Watch Trailer</a>
+                            </div>
+                        </div>
 
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Poster</label>
-                                    <div class="col-md-9">
-                                        <img src="{{ $movie->poster_url }}" alt="Poster" class="img-fluid" style="max-height: 300px;">
-                                    </div>
-                                </div>
-
-                                <div class="mb-2 row">
-                                    <label class="col-md-3 col-form-label">Trailer</label>
-                                    <div class="col-md-9">
-                                        <a href="{{ $movie->trailer_url }}" target="_blank" class="btn btn-outline-primary">Watch Trailer</a>
-                                    </div>
-                                </div>
-
-                                <hr>
-                                <div class="mb-2 row">
-                                    <div class="col-md-9 offset-md-3">
-                                        <a href="{{ route('movies.edit', $movie->id) }}" class="btn btn-info">Edit</a>
-                                        {{-- <form action="{{ route('movies.delete', $movie->id) }}" method="POST" class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this movie?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
-                                                Delete
-                                            </button>
-                                        </form> --}}
-                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">Back</a>
-                                    </div>
-                                </div>
-
-                            </div> <!-- col-md-12 -->
-                        </div> <!-- row -->
-                    </div> <!-- card-body -->
-                </div> <!-- card -->
+                        <!-- Buttons -->
+                        <hr>
+                        <div class="text-end mt-4">
+                            <a href="{{ route('movies.edit', $movie->id) }}" class="btn btn-info">Edit</a>
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">Back</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

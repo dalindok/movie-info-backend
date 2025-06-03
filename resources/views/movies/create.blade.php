@@ -1,6 +1,7 @@
 @extends('layouts.app')
+
 @section('content')
-<main class="py-5">
+<main>
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col-md-10">
@@ -23,36 +24,51 @@
                                 </div>
                             </div>
 
-                          <div class="mb-3">
-    <label for="genre_id" class="form-label">Genre</label>
-    <select name="genre_id" id="genre_id" class="form-select" required>
-        <option value="">-- Select Genre --</option>
-        @foreach ($genres as $genre)
-            <option value="{{ $genre->id }}">{{ $genre->name }}</option>
-        @endforeach
-    </select>
-</div>
+                            <!-- Genre Dropdown -->
+                            <div class="mb-3">
+                                <label for="genre_id" class="form-label">Genre</label>
+                                <select name="genre_id[]" id="genre_id" class="form-select" required>
+                                    <option value="">Select Genre</option>
+                                    @foreach ($genres as $genre)
+                                        <option value="{{ $genre->id }}">{{ $genre->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-
+                            <!-- Actor Dropdowns -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label for="actor1" class="form-label">Main Actor</label>
-                                    <input type="text" name="actor1" id="actor1" class="form-control" required>
+                                    <label for="actor_1" class="form-label">Actor 1</label>
+                                    <select name="actor_id[]" id="actor_1" class="form-select" required>
+                                        <option value="">Select Actor</option>
+                                        @foreach ($actors as $actor)
+                                            <option value="{{ $actor->id }}">{{ $actor->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="actor2" class="form-label">Supporting Actor</label>
-                                    <input type="text" name="actor2" id="actor2" class="form-control">
+                                    <label for="actor_2" class="form-label">Actor 2</label>
+                                    <select name="actor_id[]" id="actor_2" class="form-select" required>
+                                        <option value="">Select Actor</option>
+                                        @foreach ($actors as $actor)
+                                            <option value="{{ $actor->id }}">{{ $actor->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="poster_url" class="form-label">Poster Image URL</label>
-                                <input type="url" name="poster_url" id="poster_url" class="form-control" required>
+                                <a href="{{ route('actor.create') }}" class="btn btn-primary">Add New Actor</a>
                             </div>
 
                             <div class="mb-3">
-                                <label for="trailer_url" class="form-label">Trailer Link (YouTube)</label>
-                                <input type="url" name="trailer_url" id="trailer_url" class="form-control">
+                                <label for="poster" class="form-label">Poster Image URL</label>
+                                <input type="string" name="poster" id="poster" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="trailer" class="form-label">Trailer Link (YouTube)</label>
+                                <input type="url" name="trailer" id="trailer" class="form-control">
                             </div>
 
                             <div class="mb-3">

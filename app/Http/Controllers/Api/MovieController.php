@@ -15,7 +15,14 @@ class MovieController extends Controller
     {
         $query = Movie::with(['genres', 'actors']);
 
-        // Filtering
+        // Filter by genre ID (e.g., ?genre_id=3)
+        if ($genreId = $request->input('genre_id')) {
+            $query->whereHas('genres', function ($q) use ($genreId) {
+                $q->where('genres.id', $genreId);
+            });
+        }
+
+        // Filtering popular, upcoming, most rated
         if ($request->has('popular')) {
             $query->popular();
         }
@@ -32,11 +39,10 @@ class MovieController extends Controller
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%$search%");
         }
+        
 
-        // Get per_page from query, default to 10
+        // Pagination
         $perPage = $request->input('per_page', 10);
-
-        // Paginate results
         $movies = $query->paginate($perPage);
 
         return response()->json([
@@ -52,6 +58,7 @@ class MovieController extends Controller
     }
 
 
+
     /**
      * Store a newly created resource in storage.
      */
@@ -61,6 +68,8 @@ class MovieController extends Controller
             'title'         => 'required|string',
             'description'   => 'nullable|string',
             'release_date'  => 'required|date',
+            'poster' => 'sometimes|nullable|string',
+            'trailer' => 'sometimes|nullable|string',
             'genre_ids'     => 'array',
             'actor_ids'     => 'array',
         ]);
@@ -101,6 +110,9 @@ class MovieController extends Controller
             'title'        => 'sometimes|string',
             'description'  => 'sometimes|string',
             'release_date' => 'sometimes|date',
+            'rating'       => 'sometimes|numeric|min:0|max:10',
+            'poster' => 'sometimes|nullable|string',
+            'trailer' => 'sometimes|nullable|string',
             'genre_ids'    => 'sometimes|array',
             'actor_ids'    => 'sometimes|array',
         ]);
