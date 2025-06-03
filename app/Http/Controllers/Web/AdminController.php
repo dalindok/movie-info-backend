@@ -12,7 +12,7 @@ class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $totalUsers = User::count();
+        $totalUsers = User::where('role', 'user')->count();
         $totalMovies = Movie::count();
         $genres = Genre::all();
         // $movies = Movie::with('genres')->paginate(10);
@@ -24,15 +24,12 @@ class AdminController extends Controller
                 ->orWhere('description', 'like', '%' . $search . '%');
         }
 
-    $movies = $query->with(['genres', 'actors'])->paginate(10); // or ->get()
+        $movies = $query->with(['genres', 'actors'])->paginate(10); // or ->get()
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'totalMovies' => $totalMovies,
             'movies' => $movies,
             'genres' => $genres
         ]);
-       
-
-    // return view('movies.', compact('movies'));
     }
 }
