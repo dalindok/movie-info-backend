@@ -16,7 +16,7 @@ class RatingController extends Controller
         try {
             $validated = $request->validate([
                 'movie_id' => 'required|exists:movies,id',
-                'rating'   => 'required|integer|min:1|max:5',
+                'rating'   => 'required|integer|min:1|max:10',
             ]);
 
             $user = $request->user();

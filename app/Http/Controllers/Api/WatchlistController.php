@@ -16,18 +16,26 @@ class WatchlistController extends Controller
             $user = $request->user();
 
             $watchlist = $user->watchlists()
-                ->with('movie')
+                ->with(['movie' => function ($q) {
+                    $q->withAvg('ratings', 'rating');
+                }])
                 ->latest()
                 ->paginate(10);
 
             $data = $watchlist->map(function ($item) {
                 return [
-                    'movie'     => $item->movie,
-                    'added_at'  => $item->created_at,
+                    'movie' => [
+                        'id'             => $item->movie->id,
+                        'title'          => $item->movie->title,
+                        'poster'         => $item->movie->poster,
+                        'average_rating' => round($item->movie->ratings_avg_rating, 1),
+                    ],
+                    'added_at' => $item->created_at,
                 ];
             });
 
             return response()->json([
+                'message' => 'Watchlist successfully',
                 'data' => $data,
                 'pagination' => [
                     'current_page' => $watchlist->currentPage(),
@@ -41,6 +49,7 @@ class WatchlistController extends Controller
             return response()->json(['message' => 'Failed to fetch watchlist.'], 500);
         }
     }
+
 
     // POST /api/watchlist
     public function store(Request $request)

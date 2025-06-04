@@ -44,8 +44,10 @@ class Movie extends Model
     }
     public function scopePopular($query)
     {
-        return $query->where('average_rating', '>', 5)->orderByDesc('average_rating');
+        return $query->having('ratings_avg_rating', '>', 5)
+            ->orderByDesc('ratings_avg_rating');
     }
+
 
     public function scopeUpcoming($query)
     {

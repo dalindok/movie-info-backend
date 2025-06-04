@@ -13,43 +13,72 @@ class MovieController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Movie::with(['genres', 'actors']);
+        $userId = $request->input('user_id');
+        $query = Movie::with(['genres', 'actors'])->withAvg('ratings', 'rating');
 
-        // Filter by genre ID (e.g., ?genre_id=3)
+        // Filter by genre ID
         if ($genreId = $request->input('genre_id')) {
             $query->whereHas('genres', function ($q) use ($genreId) {
                 $q->where('genres.id', $genreId);
             });
         }
 
-        // Filter by popular if popular=1
+        // Filter by popular
         if ($request->filled('popular') && $request->input('popular') == 1) {
             $query->popular();
         }
 
-        // Filter by upcoming if upcoming=1
+        // Filter by upcoming
         if ($request->filled('upcoming') && $request->input('upcoming') == 1) {
             $query->upcoming();
         }
 
-
+        // Most rated
         if ($request->has('most_rated')) {
             $query->mostRated();
         }
 
-        // Optional search
+        // Search
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%$search%");
         }
-        
 
         // Pagination
         $perPage = $request->input('per_page', 10);
         $movies = $query->paginate($perPage);
 
+        // Transform each movie to add user_rate and is_watchlisted
+        $transformed = collect($movies->items())->map(function ($movie) use ($userId) {
+            $userRate = 0;
+            $isWatchlisted = false;
+
+            if ($userId) {
+                // Get the rating
+                $rating = $movie->ratings()->where('user_id', $userId)->first();
+                $userRate = $rating ? $rating->rating : 0;
+
+                // Check watchlist
+                $isWatchlisted = $movie->watchlists()->where('user_id', $userId)->exists();
+            }
+
+            return [
+                'id' => $movie->id,
+                'title' => $movie->title,
+                'description' => $movie->description,
+                'average_rating' => round($movie->ratings_avg_rating, 1),
+                'release_date' => $movie->release_date,
+                'poster' => $movie->poster,
+                'trailer' => $movie->trailer,
+                'genres' => $movie->genres,
+                'actors' => $movie->actors,
+                'user_rate' => $userRate,
+                'is_watchlisted' => $isWatchlisted,
+            ];
+        });
+
         return response()->json([
             'message' => 'Movies retrieved successfully',
-            'data'    => $movies->items(),
+            'data'    => $transformed,
             'meta'    => [
                 'page'        => $movies->currentPage(),
                 'perPage'     => $movies->perPage(),
@@ -58,6 +87,7 @@ class MovieController extends Controller
             ],
         ]);
     }
+
 
 
 
@@ -86,16 +116,50 @@ class MovieController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        $movie = Movie::with(['genres', 'actors', 'ratings'])->find($id);
+        $userId = $request->input('user_id');
+
+        $movie = Movie::with(['genres', 'actors'])
+            ->withAvg('ratings', 'rating')
+            ->find($id);
 
         if (!$movie) {
             return response()->json(['message' => 'Movie not found.'], 404);
         }
 
-        return response()->json(['message' => 'Movie detail', 'data' => $movie]);
+        // Default values
+        $userRate = 0;
+        $isWatchlisted = false;
+
+        if ($userId) {
+            // Check rating by the user
+            $rating = $movie->ratings()->where('user_id', $userId)->first();
+            $userRate = $rating ? $rating->rating : 0;
+
+            // Check if movie is in user's watchlist
+            $isWatchlisted = $movie->watchlists()->where('user_id', $userId)->exists();
+        }
+
+        return response()->json([
+            'message' => 'Movie detail',
+            'data' => [
+                'id'              => $movie->id,
+                'title'           => $movie->title,
+                'description'     => $movie->description,
+                'average_rating'  => round($movie->ratings_avg_rating, 1),
+                'release_date'    => $movie->release_date,
+                'poster'          => $movie->poster,
+                'trailer'         => $movie->trailer,
+                'genres'          => $movie->genres,
+                'actors'          => $movie->actors,
+                'user_rate'       => $userRate,
+                'is_watchlisted'  => $isWatchlisted,
+            ]
+        ]);
     }
+
+
 
     /**
      * Update the specified resource in storage.
